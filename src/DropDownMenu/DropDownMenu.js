@@ -64,6 +64,13 @@ function getStyles(props, context) {
       right: 0,
       position: 'absolute',
     },
+    input: {
+      height: 0,
+      width: 0,
+      padding: 0,
+      float: 'left',
+      position: 'absolute',
+    },
   };
 }
 
@@ -223,6 +230,7 @@ class DropDownMenu extends Component {
   };
 
   handleRequestCloseMenu = () => {
+    this.refs.input.focus();
     this.setState({
       open: false,
       anchorEl: null,
@@ -231,6 +239,7 @@ class DropDownMenu extends Component {
 
   handleItemTouchTap = (event, child, index) => {
     event.persist();
+    this.refs.input.focus();
     this.setState({
       open: false,
     }, () => {
@@ -238,6 +247,18 @@ class DropDownMenu extends Component {
         this.props.onChange(event, index, child.props.value);
       }
     });
+  };
+
+  handleInputKeyUp = (event) => {
+    // Prevent default except for tabbing
+    if (event.keyCode != 9) {
+      event.preventDefault();
+    }
+
+    // Simulate a touch tab when pressing enter, arrow up or down
+    if (event.keyCode == 13 || event.keyCode == 38 || event.keyCode == 40) {
+      this.handleTouchTapControl(event);
+    }
   };
 
   render() {
@@ -291,6 +312,10 @@ class DropDownMenu extends Component {
         className={className}
         style={prepareStyles(Object.assign({}, styles.root, open && styles.rootWhenOpen, style))}
       >
+        <input type="text"
+               ref="input"
+               style={styles.input}
+               onKeyUp={this.handleInputKeyUp} />
         <ClearFix style={styles.control} onTouchTap={this.handleTouchTapControl}>
           <div
             style={prepareStyles(Object.assign({}, styles.label, open && styles.labelWhenOpen, labelStyle))}
